@@ -169,6 +169,15 @@ public class TunerConstants {
     private static final Distance kBackRightXPos = Inches.of(-13.5);
     private static final Distance kBackRightYPos = Inches.of(-9.5);
 
+    //Coral Effector
+    public static final int kCoralEffectorId = 20;
+
+    //LeftElevator
+    public static final int kLeftElevatorId = 21;
+
+    //RightElevator
+    public static final int kRightElevatorId = 22;
+
 
     public static final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> FrontLeft =
         ConstantCreator.createModuleConstants(

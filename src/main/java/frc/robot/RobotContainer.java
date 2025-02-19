@@ -17,12 +17,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
+import frc.robot.commands.CoralIntakeCommand;
+import frc.robot.commands.ElevatorManualMoveCommand;
+import frc.robot.commands.ElevatorPositionCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.CoralEffector;
+import frc.robot.subsystems.Elevator;
 
 public class RobotContainer {
-    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond)*0.5; // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
@@ -36,9 +40,13 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final CommandXboxController joystick = new CommandXboxController(0);
+    private final CommandXboxController driveController = new CommandXboxController(0);
+    private final CommandXboxController operatorController = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+
+    public final CoralEffector coralEffector = new CoralEffector();
+    public final Elevator elevator = new Elevator();
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
@@ -56,35 +64,55 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(-driveController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-driveController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-driveController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
 
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
+        driveController.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        driveController.b().whileTrue(drivetrain.applyRequest(() ->
+            point.withModuleDirection(new Rotation2d(-driveController.getLeftY(), -driveController.getLeftX()))
         ));
 
-        joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
+        driveController.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
-        joystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
+        driveController.pov(180).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
+        );
+        driveController.pov(90).whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0).withVelocityY(-0.5))
+        );
+        driveController.pov(270).whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0).withVelocityY(0.5))
+        );
+        driveController.pov(0).whileTrue(drivetrain.applyRequest(() ->
+        forwardStraight.withVelocityX(0.5).withVelocityY(0))
+        );
+        driveController.pov(315).whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0.5).withVelocityY(0.5))
         );
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
-        joystick.back().and(joystick.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+        driveController.back().and(driveController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        driveController.back().and(driveController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        driveController.start().and(driveController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        driveController.start().and(driveController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on left bumper press
-        joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        driveController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+
+//        operatorController.rightBumper().whileTrue(new ElevatorManualMoveCommand(elevator));
+        operatorController.leftBumper().whileTrue(new CoralIntakeCommand(coralEffector));
+        operatorController.a().whileTrue(new ElevatorPositionCommand(elevator, 1));
+        operatorController.b().whileTrue(new ElevatorPositionCommand(elevator, 2));
+        operatorController.x().whileTrue(new ElevatorPositionCommand(elevator, 3));
+        operatorController.y().whileTrue(new ElevatorPositionCommand(elevator, 4));
+        operatorController.start().whileTrue(new ElevatorPositionCommand(elevator, 0));
     }
 
     public Command getAutonomousCommand() {

@@ -1,17 +1,16 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.generated.TunerConstants;
-
 
 public class Elevator extends SubsystemBase {
     private final SparkMax m_leftElevatorMotor, m_rightElevatorMotor;
@@ -24,18 +23,18 @@ public class Elevator extends SubsystemBase {
         m_rightElevatorMotor = new SparkMax(TunerConstants.kRightElevatorId, MotorType.kBrushless);
         rightMaxConfig = new SparkMaxConfig();
         leftMaxConfig = new SparkMaxConfig();
-        
+
         leftMaxConfig
-            .smartCurrentLimit(60);
+                .smartCurrentLimit(60);
         leftMaxConfig.closedLoop
-            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .pid(0.1,0.0,0.0);
+                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                .pid(0.1, 0.0, 0.0);
         rightMaxConfig
-            .follow(TunerConstants.kLeftElevatorId, true)
-            .smartCurrentLimit(60);
+                .follow(TunerConstants.kLeftElevatorId, true)
+                .smartCurrentLimit(60);
         m_leftElevatorMotor.configure(leftMaxConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_rightElevatorMotor.configure(rightMaxConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        
+
         m_leftPid = m_leftElevatorMotor.getClosedLoopController();
     }
 

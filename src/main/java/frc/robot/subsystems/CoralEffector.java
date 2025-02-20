@@ -19,11 +19,11 @@ public class CoralEffector extends SubsystemBase {
     }
 
     public void intake() {
-        m_coralEffectorMotor.set(-0.5);
+        m_coralEffectorMotor.set(-0.6);
     }
 
     public void outtake() {
-        m_coralEffectorMotor.set(-0.5);
+        m_coralEffectorMotor.set(-0.015);
     }
 
     public void stop() {

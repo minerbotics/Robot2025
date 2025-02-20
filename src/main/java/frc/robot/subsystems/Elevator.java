@@ -25,13 +25,13 @@ public class Elevator extends SubsystemBase {
         leftMaxConfig = new SparkMaxConfig();
 
         leftMaxConfig
-                .smartCurrentLimit(60);
+                .smartCurrentLimit(80);
         leftMaxConfig.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .pid(0.1, 0.0, 0.0);
+                .pid(1, 0.0, 0.0);
         rightMaxConfig
-                .follow(TunerConstants.kLeftElevatorId, true)
-                .smartCurrentLimit(60);
+                .follow(TunerConstants.kLeftElevatorId)
+                .smartCurrentLimit(80);
         m_leftElevatorMotor.configure(leftMaxConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_rightElevatorMotor.configure(rightMaxConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -39,7 +39,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public double getPosition() {
-        return m_leftElevatorMotor.getEncoder().getPosition();
+        return (m_leftElevatorMotor.getEncoder().getPosition() * 360);
     }
 
     public void raise() {

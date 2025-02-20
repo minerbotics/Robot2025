@@ -1,12 +1,13 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.CoralEffector;
 
-public class CoralIntakeCommand extends Command {
+public class CoralOuttakeCommand extends Command {
     private final CoralEffector m_CoralEffector;
 
-    public CoralIntakeCommand(CoralEffector coralEffector) {
+    public CoralOuttakeCommand(CoralEffector coralEffector) {
         m_CoralEffector = coralEffector;
         addRequirements(coralEffector);
     }
@@ -16,7 +17,7 @@ public class CoralIntakeCommand extends Command {
     }
 
     public boolean isFinished() {
-        return (m_CoralEffector.getDistance() < 100);
+        return (m_CoralEffector.getDistance() > 100);
     }
 
     public void end(boolean interrupted) {

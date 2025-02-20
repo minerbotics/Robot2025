@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.CoralIntakeCommand;
+import frc.robot.commands.CoralOuttakeCommand;
 import frc.robot.commands.ElevatorManualMoveCommand;
 import frc.robot.commands.ElevatorPositionCommand;
 import frc.robot.generated.TunerConstants;
@@ -106,7 +107,7 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-//        operatorController.rightBumper().whileTrue(new ElevatorManualMoveCommand(elevator));
+        operatorController.rightBumper().whileTrue(new CoralOuttakeCommand(coralEffector));
         operatorController.leftBumper().whileTrue(new CoralIntakeCommand(coralEffector));
         operatorController.a().whileTrue(new ElevatorPositionCommand(elevator, 1));
         operatorController.b().whileTrue(new ElevatorPositionCommand(elevator, 2));

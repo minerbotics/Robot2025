@@ -178,6 +178,10 @@ public class TunerConstants {
     //RightElevator
     public static final int kRightElevatorId = 22;
 
+    //Climber
+    public static final int kClimberId = 23;
+
+    public static final int kAlgaeMotorId = 24;
 
     public static final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> FrontLeft =
         ConstantCreator.createModuleConstants(

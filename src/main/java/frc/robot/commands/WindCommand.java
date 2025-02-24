@@ -6,17 +6,17 @@ import frc.robot.subsystems.Climber;
 public class WindCommand extends Command {
     private final Climber m_climber;
 
-    public UnwindCommand(Climber climber) {
+    public WindCommand(Climber climber) {
         m_climber = climber;
         addRequirements(climber);
     }
 
     public void execute() {
-        m_climber.unwind();
+        m_climber.wind();
     }
 
     public boolean isFinished() {
-        return (m_climber.getDistance() < 100);
+        return false;
     }
 
     public void end(boolean interrupted) {

@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.CoralIntakeCommand;
 import frc.robot.commands.CoralOuttakeCommand;
 import frc.robot.commands.ElevatorPositionCommand;
+import frc.robot.commands.AlignOn;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CoralEffector;
@@ -103,6 +104,8 @@ public class RobotContainer {
 
         // reset the field-centric heading on left bumper press
         driveController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        driveController.leftTrigger().whileTrue(new AlignOn(drivetrain, "left"));
+        driveController.rightTrigger().whileTrue(new AlignOn(drivetrain, "right"));
 
         drivetrain.registerTelemetry(logger::telemeterize);
 

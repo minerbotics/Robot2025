@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.generated.TunerConstants;
 
@@ -18,17 +19,32 @@ public class Elevator extends SubsystemBase {
     private SparkMaxConfig rightMaxConfig;
     private SparkClosedLoopController m_leftPid;
 
+
+    public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput;
+
     public Elevator() {
         m_leftElevatorMotor = new SparkMax(TunerConstants.kLeftElevatorId, MotorType.kBrushless);
         m_rightElevatorMotor = new SparkMax(TunerConstants.kRightElevatorId, MotorType.kBrushless);
         rightMaxConfig = new SparkMaxConfig();
         leftMaxConfig = new SparkMaxConfig();
 
+        // PID coefficients
+        kP = 1;
+        kI = 0;
+        kD = 0;
+        kIz = 0;
+        kFF = 0.75;
+        kMaxOutput = 0.5;
+        kMinOutput = -0.5;
+
         leftMaxConfig
                 .smartCurrentLimit(80);
         leftMaxConfig.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .pid(1, 0.0, 0.0);
+                .pid(kP, kI, kD)
+                .velocityFF(kFF)
+                .maxOutput(kMaxOutput)
+                .minOutput(kMinOutput);
         rightMaxConfig
                 .follow(TunerConstants.kLeftElevatorId)
                 .smartCurrentLimit(80);
@@ -36,6 +52,23 @@ public class Elevator extends SubsystemBase {
         m_rightElevatorMotor.configure(rightMaxConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         m_leftPid = m_leftElevatorMotor.getClosedLoopController();
+        
+        // display PID coefficients on SmartDashboard
+        SmartDashboard.putNumber("P Gain", kP);
+        SmartDashboard.putNumber("I Gain", kI);
+        SmartDashboard.putNumber("D Gain", kD);
+        SmartDashboard.putNumber("I Zone", kIz);
+        SmartDashboard.putNumber("Feed Forward", kFF);
+        SmartDashboard.putNumber("Max Output", kMaxOutput);
+        SmartDashboard.putNumber("Min Output", kMinOutput);
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Encoder Position Degrees", this.getPosition());
+        SmartDashboard.putNumber("Encoder Position Rotations", m_leftElevatorMotor.getEncoder().getPosition());
+        SmartDashboard.putNumber("Alt Encoder Velocity", m_leftElevatorMotor.getEncoder().getVelocity());
+        SmartDashboard.putNumber("Applied Output", m_leftElevatorMotor.getAppliedOutput());
     }
 
     public double getPosition() {
@@ -52,6 +85,8 @@ public class Elevator extends SubsystemBase {
 
     public void goToPosition(double position) {
         double rotations = degreesToRotation(position);
+        SmartDashboard.putNumber("Set Point", rotations);
+        SmartDashboard.putNumber("Set Point Degrees", position);
         m_leftPid.setReference(rotations, ControlType.kPosition);
     }
 

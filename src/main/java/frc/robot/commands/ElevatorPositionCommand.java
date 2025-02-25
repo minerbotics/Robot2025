@@ -13,7 +13,7 @@ public class ElevatorPositionCommand extends Command {
     public ElevatorPositionCommand(Elevator elevator, int level) {
         m_elevator = elevator;
         m_level = level;
-        positionTolerance = 2.0;
+        positionTolerance = 1.0;
         addRequirements(elevator);
     }
 
@@ -23,16 +23,16 @@ public class ElevatorPositionCommand extends Command {
                 targetPosition = 0;
                 break;
             case 1:
-                targetPosition = -25000;
+                targetPosition = -18500;
                 break;
             case 2:
-                targetPosition = -30000;
+                targetPosition = -46000;
                 break;
             case 3:
-                targetPosition = -41000;
+                targetPosition = -76000;
                 break;
             case 4:
-                targetPosition = -50000;
+                targetPosition = -250;
                 break;
             default:
                 targetPosition = 0;

@@ -20,8 +20,11 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.CoralIntakeCommand;
 import frc.robot.commands.CoralOuttakeCommand;
 import frc.robot.commands.ElevatorPositionCommand;
+import frc.robot.commands.UnwindCommand;
+import frc.robot.commands.WindCommand;
 import frc.robot.commands.AlignOn;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CoralEffector;
 import frc.robot.subsystems.Elevator;
@@ -48,6 +51,7 @@ public class RobotContainer {
 
     public final CoralEffector coralEffector = new CoralEffector();
     public final Elevator elevator = new Elevator();
+    public final Climber climber = new Climber();
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
@@ -106,6 +110,9 @@ public class RobotContainer {
         driveController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         driveController.leftTrigger().whileTrue(new AlignOn(drivetrain, "left"));
         driveController.rightTrigger().whileTrue(new AlignOn(drivetrain, "right"));
+
+        driveController.x().whileTrue(new WindCommand(climber));
+        driveController.y().whileTrue(new UnwindCommand(climber));
 
         drivetrain.registerTelemetry(logger::telemeterize);
 

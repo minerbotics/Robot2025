@@ -29,11 +29,11 @@ public class Elevator extends SubsystemBase {
         leftMaxConfig = new SparkMaxConfig();
 
         // PID coefficients
-        kP = 1;
+        kP = 1.5;
         kI = 0;
         kD = 0;
         kIz = 0;
-        kFF = 0.75;
+        kFF = 0.05;
         kMaxOutput = 0.5;
         kMinOutput = -0.5;
 
@@ -85,7 +85,7 @@ public class Elevator extends SubsystemBase {
 
     public void goToPosition(double position) {
         double rotations = degreesToRotation(position);
-        SmartDashboard.putNumber("Set Point", rotations);
+        SmartDashboard.putNumber("Set Point Rotations", rotations);
         SmartDashboard.putNumber("Set Point Degrees", position);
         m_leftPid.setReference(rotations, ControlType.kPosition);
     }

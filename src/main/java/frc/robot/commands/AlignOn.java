@@ -2,7 +2,7 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.*;
 
-
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,88 +15,92 @@ public class AlignOn extends Command {
     private final CommandSwerveDrivetrain m_drivetrain;
     private final Limelight m_limelight;
     private final String m_direction;
+    private final SwerveRequest.RobotCentric m_alignOnRequest;
 
-    private boolean m_inPosition;
-    private double txMin, txMax, taMin, taMax;
+    private double targetX, targetArea = 0.35;
+    private static final double distanceTolerance = 0.1;
+    private static final double angleTolerance = 1.0;
 
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond)*0.5;
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+
+    private double lastValidX = 0.0;
+    private double lastValidArea = 0.0;
+
+    private double lastHorizontalAdjust = 0.0;
 
     public AlignOn(CommandSwerveDrivetrain drivetrain, String direction) {
         m_drivetrain = drivetrain;
         m_direction = direction;
         m_limelight = new Limelight();
+        m_alignOnRequest = new SwerveRequest.RobotCentric()
+            .withDeadband(0.1)
+            .withRotationalDeadband(0.1)
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
         addRequirements(drivetrain);
     }
 
     public void execute() {
 
+        double currentX = m_limelight.getTX();
+        double currentArea = m_limelight.getTA();
+
         if (m_direction.equals("right")) {
-            txMin = -4;
-            txMax = -2;
+            targetX = -3;
         }
         if (m_direction.equals("left")) {
-            txMin = 2;
-            txMax = 4;
+            targetX = 3;
         }
 
-        double tx = m_limelight.getTX();
-        double ta = m_limelight.getTA();
-        double tv = m_limelight.getTV();
-
-        double vx = 0.0;
-        double vy = 0.0;
-        double omega = 0.0;
-
-        boolean inRange = false;
-        boolean linedUp = false;
-
-        if (tx > txMax || tx < txMin) {
-            vy = tx * 0.035;
-            linedUp = false;
+        if (currentX != targetX || currentArea != targetArea) {
+            lastValidX = currentX;
+            lastValidArea = currentArea;
         } else {
-            vy = 0.0;
-            linedUp = true;
-        }
-      
-        if (ta > taMax) {
-            // Forward
-            vx = 0.5;
-            linedUp = false;
-        } else if (ta < taMin) {
-            // Backward
-            vx = -0.5;
-            linedUp = false;
-        } else {
-            vx = 0.0;
-            inRange = true;
-        }
-      
-        if(linedUp && inRange) {
-            m_inPosition = true;
-        } else {
-            m_inPosition = false;
+            currentX = 0.0;
+            currentArea = 0.0;
         }
 
-        move(vx,  vy, omega);
+        double distanceError = targetArea - currentArea;
+        double horizontalError = -currentX; // Invert TX for horizontal adjustment
+        
+        double targetingForwardSpeed = distanceError * -0.1;
+        System.out.println("Calculated targetingForwardSpeed: " + targetingForwardSpeed);
+        targetingForwardSpeed *= MaxSpeed;
+        targetingForwardSpeed *= -1.0;
+        double distanceAdjust = targetingForwardSpeed;
+        
+        double horizontalAdjust = horizontalError * 0.05;
+        
+        // Smoothing the horizontal adjustment to prevent jerky movement
+        horizontalAdjust = (horizontalAdjust + lastHorizontalAdjust) / 2;
+        lastHorizontalAdjust = horizontalAdjust;
+
+        System.out.println("AlignCommand executing");
+        System.out.println("Distance Adjust: " + distanceAdjust);
+        System.out.println("Horizontal Adjust: " + horizontalAdjust);
+
+        move(distanceAdjust, horizontalAdjust, 0);
     }
 
     public boolean isFinished() {
-        return m_inPosition;
+        return Math.abs(lastValidArea - targetArea) < distanceTolerance && Math.abs(lastValidX - targetX) < angleTolerance;
     }
 
     public void end(boolean interrupted) {
-        m_drivetrain.applyRequest(() -> new SwerveRequest.SwerveDriveBrake());
+        m_drivetrain.setControl(
+            m_alignOnRequest
+                .withVelocityX(0)
+                .withVelocityY(0)
+                .withRotationalRate(0)
+        );
     }
 
     private void move(double vx, double vy, double omega) {
-        
-        m_drivetrain.applyRequest(() -> new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1)
-            .withRotationalDeadband(MaxAngularRate * 0.1)
-            .withVelocityX(-vx * MaxSpeed) // Drive forward with negative Y (forward)
-            .withVelocityY(-vy * MaxSpeed) // Drive left with negative X (left)
-            .withRotationalRate(-omega * MaxAngularRate)); // Drive counterclockwise with negative X (left));
-    
+        m_drivetrain.setControl(
+            m_alignOnRequest
+                .withVelocityX(vx)  // Forward/backward movement
+                .withVelocityY(vy) // Horizontal (lateral) movement
+                .withRotationalRate(omega) // Rotational correction
+        );
     }
 }

@@ -23,10 +23,10 @@ public class Limelight extends SubsystemBase {
         tid = m_limelightTable.getEntry("tid").getDouble(0);
         boolean m_limelightHasTarget = (tv < 1.0) ? false : true;
 
-        SmartDashboard.putNumber("LimelightX", tx);
-        SmartDashboard.putNumber("Limelighty", ty);
-        SmartDashboard.putNumber("LimelightArea", ta);
-        SmartDashboard.putBoolean("LimelightTarget", m_limelightHasTarget);
+        SmartDashboard.putNumber("Limelight X", tx);
+        SmartDashboard.putNumber("Limelight Y", ty);
+        SmartDashboard.putNumber("Limelight Area", ta);
+        SmartDashboard.putBoolean("Limelight Sees Target", m_limelightHasTarget);
         SmartDashboard.putNumber("Limelight Skew", ts);
         SmartDashboard.putNumber("Target ID", tid);
     }

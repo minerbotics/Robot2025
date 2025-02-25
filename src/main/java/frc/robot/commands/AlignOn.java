@@ -17,14 +17,14 @@ public class AlignOn extends Command {
     private final String m_direction;
     private final SwerveRequest.RobotCentric m_alignOnRequest;
 
-    private double targetX, targetArea = 0.35;
+    private double targetX, targetY = 0.35;
     private static final double distanceTolerance = 0.1;
     private static final double angleTolerance = 1.0;
 
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond)*0.5;
 
     private double lastValidX = 0.0;
-    private double lastValidArea = 0.0;
+    private double lastValidY = 0.0;
 
     private double lastHorizontalAdjust = 0.0;
 
@@ -43,7 +43,7 @@ public class AlignOn extends Command {
     public void execute() {
 
         double currentX = m_limelight.getTX();
-        double currentArea = m_limelight.getTA();
+        double currentY = m_limelight.getTY();
 
         if (m_direction.equals("right")) {
             targetX = -3;
@@ -52,15 +52,15 @@ public class AlignOn extends Command {
             targetX = 3;
         }
 
-        if (currentX != targetX || currentArea != targetArea) {
+        if (currentX != targetX || currentY != targetY) {
             lastValidX = currentX;
-            lastValidArea = currentArea;
+            lastValidY = currentY;
         } else {
             currentX = 0.0;
-            currentArea = 0.0;
+            currentY = 0.0;
         }
 
-        double distanceError = targetArea - currentArea;
+        double distanceError = targetY - currentY;
         double horizontalError = -currentX; // Invert TX for horizontal adjustment
         
         double targetingForwardSpeed = distanceError * -0.1;
@@ -79,11 +79,16 @@ public class AlignOn extends Command {
         System.out.println("Distance Adjust: " + distanceAdjust);
         System.out.println("Horizontal Adjust: " + horizontalAdjust);
 
-        move(distanceAdjust, horizontalAdjust, 0);
+        m_drivetrain.setControl(
+            m_alignOnRequest
+                .withVelocityX(distanceAdjust)  // Forward/backward movement
+                .withVelocityY(horizontalAdjust) // Horizontal (lateral) movement
+                .withRotationalRate(0) // Rotational correction
+        );
     }
 
     public boolean isFinished() {
-        return Math.abs(lastValidArea - targetArea) < distanceTolerance && Math.abs(lastValidX - targetX) < angleTolerance;
+        return Math.abs(lastValidY - targetY) < distanceTolerance && Math.abs(lastValidX - targetX) < angleTolerance;
     }
 
     public void end(boolean interrupted) {
@@ -92,15 +97,6 @@ public class AlignOn extends Command {
                 .withVelocityX(0)
                 .withVelocityY(0)
                 .withRotationalRate(0)
-        );
-    }
-
-    private void move(double vx, double vy, double omega) {
-        m_drivetrain.setControl(
-            m_alignOnRequest
-                .withVelocityX(vx)  // Forward/backward movement
-                .withVelocityY(vy) // Horizontal (lateral) movement
-                .withRotationalRate(omega) // Rotational correction
         );
     }
 }

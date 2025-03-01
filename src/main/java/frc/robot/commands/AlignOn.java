@@ -50,7 +50,7 @@ public class AlignOn extends Command {
             targetY = 1.7;
         }
         if (m_direction.equals("left")) {
-            targetX = 18.1;
+            targetX = 17.5;
             targetY = 5;
         }
 
@@ -86,8 +86,8 @@ public class AlignOn extends Command {
 
         m_drivetrain.setControl(
             m_alignOnRequest
-                .withVelocityX(distanceAdjust / 5)  // Forward/backward movement
-                .withVelocityY(-horizontalAdjust / 5) // Horizontal (lateral) movement
+                .withVelocityX(distanceAdjust / 3)  // Forward/backward movement
+                .withVelocityY(-horizontalAdjust / 3) // Horizontal (lateral) movement
                 .withRotationalRate(0) // Rotational correction
         );
     }

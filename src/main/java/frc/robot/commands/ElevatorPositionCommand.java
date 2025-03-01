@@ -23,7 +23,7 @@ public class ElevatorPositionCommand extends Command {
                 targetPosition = 0;
                 break;
             case 1:
-                targetPosition = -18500;
+                targetPosition = -20500;
                 break;
             case 2:
                 targetPosition = -46000;
@@ -32,7 +32,7 @@ public class ElevatorPositionCommand extends Command {
                 targetPosition = -76000;
                 break;
             case 4:
-                targetPosition = -34000;
+                targetPosition = -32000;
                 break;
             default:
                 targetPosition = 0;

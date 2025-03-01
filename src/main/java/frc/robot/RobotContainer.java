@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.CoralIntakeCommand;
 import frc.robot.commands.CoralOuttakeCommand;
+import frc.robot.commands.CoralReverseCommand;
+import frc.robot.commands.ElevatorManualMoveCommand;
 import frc.robot.commands.ElevatorPositionCommand;
 import frc.robot.commands.UnwindCommand;
 import frc.robot.commands.WindCommand;
@@ -81,19 +83,16 @@ public class RobotContainer {
         ));
 
         driveController.pov(0).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0.5).withVelocityY(0))
+            forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
         driveController.pov(180).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(-0.5).withVelocityY(0))
+            forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
         driveController.pov(90).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0).withVelocityY(0.5))
         );
         driveController.pov(270).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0).withVelocityY(-0.5))
-        );
-        driveController.pov(0).whileTrue(drivetrain.applyRequest(() ->
-        forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
         driveController.pov(315).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(-0.5))
@@ -118,11 +117,13 @@ public class RobotContainer {
 
         operatorController.rightBumper().whileTrue(new CoralOuttakeCommand(coralEffector));
         operatorController.leftBumper().whileTrue(new CoralIntakeCommand(coralEffector));
+        operatorController.leftTrigger().whileTrue(new CoralReverseCommand(coralEffector));
         operatorController.a().whileTrue(new ElevatorPositionCommand(elevator, 1));
         operatorController.b().whileTrue(new ElevatorPositionCommand(elevator, 2));
         operatorController.x().whileTrue(new ElevatorPositionCommand(elevator, 3));
         operatorController.y().whileTrue(new ElevatorPositionCommand(elevator, 4));
         operatorController.start().whileTrue(new ElevatorPositionCommand(elevator, 0));
+        operatorController.pov(0).whileTrue(new ElevatorManualMoveCommand(elevator));
     }
 
     public Command getAutonomousCommand() {

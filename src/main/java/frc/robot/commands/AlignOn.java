@@ -17,9 +17,9 @@ public class AlignOn extends Command {
     private final String m_direction;
     private final SwerveRequest.RobotCentric m_alignOnRequest;
 
-    private double targetX, targetY = 0.35;
+    private double targetX, targetY;
     private static final double distanceTolerance = 0.1;
-    private static final double angleTolerance = 1.0;
+    private static final double angleTolerance = 0.5;
 
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond)*0.5;
 
@@ -46,10 +46,12 @@ public class AlignOn extends Command {
         double currentY = m_limelight.getTY();
 
         if (m_direction.equals("right")) {
-            targetX = -3;
+            targetX = -21;
+            targetY = 1.7;
         }
         if (m_direction.equals("left")) {
-            targetX = 3;
+            targetX = 18.1;
+            targetY = 5;
         }
 
         if (currentX != targetX || currentY != targetY) {
@@ -61,12 +63,12 @@ public class AlignOn extends Command {
         }
 
         double distanceError = targetY - currentY;
-        double horizontalError = -currentX; // Invert TX for horizontal adjustment
+        double horizontalError = targetX - currentX; // Invert TX for horizontal adjustment
         
         double targetingForwardSpeed = distanceError * -0.1;
         System.out.println("Calculated targetingForwardSpeed: " + targetingForwardSpeed);
         targetingForwardSpeed *= MaxSpeed;
-        targetingForwardSpeed *= -1.0;
+        targetingForwardSpeed *= 0.25;
         double distanceAdjust = targetingForwardSpeed;
         
         double horizontalAdjust = horizontalError * 0.05;
@@ -77,12 +79,15 @@ public class AlignOn extends Command {
 
         System.out.println("AlignCommand executing");
         System.out.println("Distance Adjust: " + distanceAdjust);
+        System.out.println("Horizontal error: " + horizontalError);
         System.out.println("Horizontal Adjust: " + horizontalAdjust);
+        System.out.println("Target X: " + targetX);
+        System.out.println("Current X: " + currentX);
 
         m_drivetrain.setControl(
             m_alignOnRequest
-                .withVelocityX(distanceAdjust)  // Forward/backward movement
-                .withVelocityY(horizontalAdjust) // Horizontal (lateral) movement
+                .withVelocityX(distanceAdjust / 5)  // Forward/backward movement
+                .withVelocityY(-horizontalAdjust / 5) // Horizontal (lateral) movement
                 .withRotationalRate(0) // Rotational correction
         );
     }

@@ -69,15 +69,15 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-driveController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-driveController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                drive.withVelocityX(driveController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(driveController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(-driveController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
 
         driveController.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driveController.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-driveController.getLeftY(), -driveController.getLeftX()))
+            point.withModuleDirection(new Rotation2d(driveController.getLeftY(), -driveController.getLeftX()))
         ));
 
         driveController.pov(0).whileTrue(drivetrain.applyRequest(() ->
@@ -87,16 +87,16 @@ public class RobotContainer {
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
         driveController.pov(90).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0).withVelocityY(-0.5))
+            forwardStraight.withVelocityX(0).withVelocityY(0.5))
         );
         driveController.pov(270).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0).withVelocityY(0.5))
+            forwardStraight.withVelocityX(0).withVelocityY(-0.5))
         );
         driveController.pov(0).whileTrue(drivetrain.applyRequest(() ->
         forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
         driveController.pov(315).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0.5).withVelocityY(0.5))
+            forwardStraight.withVelocityX(0.5).withVelocityY(-0.5))
         );
 
         // Run SysId routines when holding back/start and X/Y.

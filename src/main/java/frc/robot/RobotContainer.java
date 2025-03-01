@@ -19,8 +19,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.CoralIntakeCommand;
 import frc.robot.commands.CoralOuttakeCommand;
+import frc.robot.commands.CoralReverseCommand;
+import frc.robot.commands.ElevatorManualMoveCommand;
 import frc.robot.commands.ElevatorPositionCommand;
+import frc.robot.commands.UnwindCommand;
+import frc.robot.commands.WindCommand;
+import frc.robot.commands.AlignOn;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CoralEffector;
 import frc.robot.subsystems.Elevator;
@@ -47,6 +53,7 @@ public class RobotContainer {
 
     public final CoralEffector coralEffector = new CoralEffector();
     public final Elevator elevator = new Elevator();
+    public final Climber climber = new Climber();
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
@@ -64,34 +71,31 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-driveController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-driveController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                drive.withVelocityX(driveController.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(driveController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(-driveController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
 
         driveController.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driveController.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-driveController.getLeftY(), -driveController.getLeftX()))
+            point.withModuleDirection(new Rotation2d(driveController.getLeftY(), -driveController.getLeftX()))
         ));
 
         driveController.pov(0).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0.5).withVelocityY(0))
-        );
-        driveController.pov(180).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
-        driveController.pov(90).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0).withVelocityY(-0.5))
+        driveController.pov(180).whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
-        driveController.pov(270).whileTrue(drivetrain.applyRequest(() ->
+        driveController.pov(90).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0).withVelocityY(0.5))
         );
-        driveController.pov(0).whileTrue(drivetrain.applyRequest(() ->
-        forwardStraight.withVelocityX(0.5).withVelocityY(0))
+        driveController.pov(270).whileTrue(drivetrain.applyRequest(() ->
+            forwardStraight.withVelocityX(0).withVelocityY(-0.5))
         );
         driveController.pov(315).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0.5).withVelocityY(0.5))
+            forwardStraight.withVelocityX(0.5).withVelocityY(-0.5))
         );
 
         // Run SysId routines when holding back/start and X/Y.
@@ -103,16 +107,23 @@ public class RobotContainer {
 
         // reset the field-centric heading on left bumper press
         driveController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        driveController.leftTrigger().whileTrue(new AlignOn(drivetrain, "left"));
+        driveController.rightTrigger().whileTrue(new AlignOn(drivetrain, "right"));
+
+        driveController.x().whileTrue(new WindCommand(climber));
+        driveController.y().whileTrue(new UnwindCommand(climber));
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
         operatorController.rightBumper().whileTrue(new CoralOuttakeCommand(coralEffector));
         operatorController.leftBumper().whileTrue(new CoralIntakeCommand(coralEffector));
+        operatorController.leftTrigger().whileTrue(new CoralReverseCommand(coralEffector));
         operatorController.a().whileTrue(new ElevatorPositionCommand(elevator, 1));
         operatorController.b().whileTrue(new ElevatorPositionCommand(elevator, 2));
         operatorController.x().whileTrue(new ElevatorPositionCommand(elevator, 3));
         operatorController.y().whileTrue(new ElevatorPositionCommand(elevator, 4));
         operatorController.start().whileTrue(new ElevatorPositionCommand(elevator, 0));
+        operatorController.pov(0).whileTrue(new ElevatorManualMoveCommand(elevator));
     }
 
     public Command getAutonomousCommand() {

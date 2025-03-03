@@ -22,10 +22,15 @@ import frc.robot.commands.CoralOuttakeCommand;
 import frc.robot.commands.CoralReverseCommand;
 import frc.robot.commands.ElevatorManualMoveCommand;
 import frc.robot.commands.ElevatorPositionCommand;
+import frc.robot.commands.IntakeAlgaeCommand;
+import frc.robot.commands.OuttakeAlgaeCommand;
+import frc.robot.commands.ToggleAlgaeEffectorCommand;
+import frc.robot.commands.TurnToReefCommand;
 import frc.robot.commands.UnwindCommand;
 import frc.robot.commands.WindCommand;
 import frc.robot.commands.AlignOn;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.AlgaeEffector;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CoralEffector;
@@ -52,6 +57,7 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public final CoralEffector coralEffector = new CoralEffector();
+    public final AlgaeEffector algaeEffector = new AlgaeEffector();
     public final Elevator elevator = new Elevator();
     public final Climber climber = new Climber();
 
@@ -113,6 +119,8 @@ public class RobotContainer {
         driveController.x().whileTrue(new WindCommand(climber));
         driveController.y().whileTrue(new UnwindCommand(climber));
 
+        driveController.rightStick().whileTrue(new TurnToReefCommand(drivetrain));
+
         drivetrain.registerTelemetry(logger::telemeterize);
 
         operatorController.rightBumper().whileTrue(new CoralOuttakeCommand(coralEffector));
@@ -124,6 +132,10 @@ public class RobotContainer {
         operatorController.y().whileTrue(new ElevatorPositionCommand(elevator, 4));
         operatorController.start().whileTrue(new ElevatorPositionCommand(elevator, 0));
         operatorController.pov(0).whileTrue(new ElevatorManualMoveCommand(elevator));
+
+        operatorController.pov(180).onTrue(new ToggleAlgaeEffectorCommand(algaeEffector));
+        operatorController.pov(90).whileTrue(new IntakeAlgaeCommand(algaeEffector));
+        operatorController.pov(270).whileTrue(new OuttakeAlgaeCommand(algaeEffector));
     }
 
     public Command getAutonomousCommand() {

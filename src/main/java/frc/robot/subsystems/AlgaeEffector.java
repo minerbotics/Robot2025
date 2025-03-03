@@ -43,4 +43,8 @@ public class AlgaeEffector extends SubsystemBase {
     public void algaeStop() {
         m_algaeMotor.set(0);
     }
+
+    public boolean armsExtended() {
+        return m_algaeSolenoid.get() == Value.kForward;
+    }
 }

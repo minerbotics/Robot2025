@@ -22,6 +22,7 @@ import frc.robot.commands.CoralOuttakeCommand;
 import frc.robot.commands.CoralReverseCommand;
 import frc.robot.commands.ElevatorManualMoveCommand;
 import frc.robot.commands.ElevatorPositionCommand;
+import frc.robot.commands.TurnToReefCommand;
 import frc.robot.commands.UnwindCommand;
 import frc.robot.commands.WindCommand;
 import frc.robot.commands.AlignOn;
@@ -112,6 +113,8 @@ public class RobotContainer {
 
         driveController.x().whileTrue(new WindCommand(climber));
         driveController.y().whileTrue(new UnwindCommand(climber));
+
+        driveController.rightStick().whileTrue(new TurnToReefCommand(drivetrain));
 
         drivetrain.registerTelemetry(logger::telemeterize);
 

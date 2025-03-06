@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -38,7 +39,8 @@ public class Elevator extends SubsystemBase {
         kMinOutput = -0.5;
 
         leftMaxConfig
-                .smartCurrentLimit(80);
+                .smartCurrentLimit(80)
+                .idleMode(IdleMode.kBrake);
         leftMaxConfig.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .pid(kP, kI, kD)
@@ -47,7 +49,8 @@ public class Elevator extends SubsystemBase {
                 .minOutput(kMinOutput);
         rightMaxConfig
                 .follow(TunerConstants.kLeftElevatorId)
-                .smartCurrentLimit(80);
+                .smartCurrentLimit(80)
+                .idleMode(IdleMode.kBrake);
         m_leftElevatorMotor.configure(leftMaxConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_rightElevatorMotor.configure(rightMaxConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 

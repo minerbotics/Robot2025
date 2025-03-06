@@ -18,6 +18,8 @@ public class TurnToReefCommand extends Command{
     public TurnToReefCommand(CommandSwerveDrivetrain drivetrain) {
         m_drivetrain = drivetrain;
         m_driveRequest = new SwerveRequest.FieldCentric();
+
+        addRequirements(drivetrain);
     }
 
     public void execute() {

@@ -24,7 +24,8 @@ import frc.robot.commands.ElevatorManualMoveCommand;
 import frc.robot.commands.ElevatorPositionCommand;
 import frc.robot.commands.IntakeAlgaeCommand;
 import frc.robot.commands.OuttakeAlgaeCommand;
-import frc.robot.commands.ToggleAlgaeEffectorCommand;
+import frc.robot.commands.RetractAlgaeEffectorCommand;
+import frc.robot.commands.ExtendAlgaeEffectorCommand;
 import frc.robot.commands.TurnToReefCommand;
 import frc.robot.commands.UnwindCommand;
 import frc.robot.commands.WindCommand;
@@ -133,7 +134,8 @@ public class RobotContainer {
         operatorController.start().whileTrue(new ElevatorPositionCommand(elevator, 0));
         operatorController.pov(0).whileTrue(new ElevatorManualMoveCommand(elevator));
 
-        operatorController.pov(180).onTrue(new ToggleAlgaeEffectorCommand(algaeEffector));
+        operatorController.rightStick().onTrue(new ExtendAlgaeEffectorCommand(algaeEffector));
+        operatorController.leftStick().onTrue(new RetractAlgaeEffectorCommand(algaeEffector));
         operatorController.pov(90).whileTrue(new IntakeAlgaeCommand(algaeEffector));
         operatorController.pov(270).whileTrue(new OuttakeAlgaeCommand(algaeEffector));
     }

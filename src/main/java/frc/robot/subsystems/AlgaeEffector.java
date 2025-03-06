@@ -18,8 +18,8 @@ public class AlgaeEffector extends SubsystemBase {
 
         m_algaeSolenoid = new DoubleSolenoid(
             PneumaticsModuleType.CTREPCM,
-            0,
-            1);
+            4,
+            7);
 
         m_algaeMotor = new SparkMax(TunerConstants.kAlgaeMotorId, MotorType.kBrushless);
     }

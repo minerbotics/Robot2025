@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TinyMove"
+            "pathName": "Straight L2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "coralOuttake"
           }
         }
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }

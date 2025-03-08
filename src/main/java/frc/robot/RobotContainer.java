@@ -10,6 +10,7 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -55,19 +56,32 @@ public class RobotContainer {
     private final CommandXboxController driveController = new CommandXboxController(0);
     private final CommandXboxController operatorController = new CommandXboxController(1);
 
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    public final CommandSwerveDrivetrain drivetrain;
 
-    public final CoralEffector coralEffector = new CoralEffector();
-    public final AlgaeEffector algaeEffector = new AlgaeEffector();
-    public final Elevator elevator = new Elevator();
+    public final CoralEffector coralEffector;
+    public final AlgaeEffector algaeEffector;
+    public final Elevator elevator;
     public final Climber climber = new Climber();
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
-        autoChooser = AutoBuilder.buildAutoChooser("Tests");
+        
+        drivetrain = TunerConstants.createDrivetrain();
+
+        coralEffector = new CoralEffector();
+        algaeEffector = new AlgaeEffector();
+        elevator = new Elevator();
+
+        NamedCommands.registerCommand("elevatorL1", new ElevatorPositionCommand(elevator, 1));
+        NamedCommands.registerCommand("elevatorL2", new ElevatorPositionCommand(elevator, 2));
+        NamedCommands.registerCommand("elevatorL3", new ElevatorPositionCommand(elevator, 3));
+        NamedCommands.registerCommand("coralOuttake", new CoralOuttakeCommand(coralEffector));
+
+        autoChooser = AutoBuilder.buildAutoChooser("Basic Move");
         SmartDashboard.putData("Auto Mode", autoChooser);
+
 
         configureBindings();
     }

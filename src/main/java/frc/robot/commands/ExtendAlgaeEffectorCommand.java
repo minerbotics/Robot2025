@@ -3,20 +3,16 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.AlgaeEffector;
 
-public class ToggleAlgaeEffectorCommand extends Command {
+public class ExtendAlgaeEffectorCommand extends Command {
     
     private final AlgaeEffector m_algaeEffector;
 
-    public ToggleAlgaeEffectorCommand(AlgaeEffector algaeEffector) {
+    public ExtendAlgaeEffectorCommand(AlgaeEffector algaeEffector) {
         m_algaeEffector = algaeEffector;
         addRequirements(algaeEffector);
     }
 
     public void execute() {
-        if (m_algaeEffector.armsExtended()) {
-            m_algaeEffector.armsIn();
-        } else {
-            m_algaeEffector.armsOut();
-        }
+        m_algaeEffector.armsOut();
     }
 }

@@ -16,7 +16,7 @@ public class CoralReverseCommand extends Command {
     }
 
     public boolean isFinished() {
-        return (m_CoralEffector.getDistance() < 100);
+        return false;
     }
 
     public void end(boolean interrupted) {

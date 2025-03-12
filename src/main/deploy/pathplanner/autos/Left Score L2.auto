@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TinyMove"
+            "pathName": "Left L2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "coralOuttake"
           }
         }
       ]
